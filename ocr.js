@@ -50,9 +50,14 @@ var ocrDemo = {
 		canvas.isDrawing = false
 	},
 
+	initializeDataArray: () => {
+		const pixelCount = parseInt(this.ocrDemo.TRANSLATED_WIDTH) ** 2;
+		this.ocrDemo.data = new Array(pixelCount).fill(0);
+	},
+
     onLoadFunction: () => {
 		this.ocrDemo.TRANSLATED_WIDTH = this.ocrDemo.CANVAS_WIDTH / this.ocrDemo.PIXEL_WIDTH;
-		data = new Array(parseInt(this.ocrDemo.TRANSLATED_WIDTH) ** 2).map(() => 0);
+		this.ocrDemo.initializeDataArray();
 		const { canvas, context } = this.ocrDemo.getContext();
         this.ocrDemo.drawGrid(context);
         canvas.addEventListener("mousemove", this.ocrDemo.onMouseMove);
@@ -76,7 +81,7 @@ var ocrDemo = {
 	},
 
 	resetCanvas: () => {
-		this.ocrDemo.data = this.ocrDemo.data.map(() => 0);
+		this.ocrDemo.initializeDataArray();
 		const { canvas, context } = this.ocrDemo.getContext();
 		context.reset();
         this.ocrDemo.drawGrid(context);
