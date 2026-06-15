@@ -102,7 +102,6 @@ var ocrDemo = {
 		this.ocrDemo.trainingRequestCount =+ 1;
 
 		if (this.ocrDemo.trainingRequestCount >= this.ocrDemo.BATCH_SIZE) {
-			alert("Sending training data to the server...");
 			const json = {
 				trainArray: this.trainArray,
 				train: true,
