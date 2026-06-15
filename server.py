@@ -26,7 +26,6 @@ class MyServer(BaseHTTPRequestHandler):
         var_len = int(self.headers.get('Content-Length'))
         content = self.rfile.read(var_len);
         payload = json.loads(content);
-        print(payload)
 
         self.send_header("Content-Type", "application/json")
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -52,9 +51,12 @@ class MyServer(BaseHTTPRequestHandler):
             response_code = 400
     
         self.send_response(response_code)
-    
+        
+        """
         if response:
             self.wfile.write(json.dumps(response))
+        """
+
         return
 
 if __name__ == "__main__":
