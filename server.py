@@ -12,6 +12,7 @@ class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-Type", "text/html")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(bytes("<html><head><title>https://pythonbasics.org</title></head>", "utf-8"))
         self.wfile.write(bytes("<p>Request: %s</p>" % self.path, "utf-8"))
@@ -25,25 +26,32 @@ class MyServer(BaseHTTPRequestHandler):
         var_len = int(s.headers.get('Content-Length'))
         content = s.rfile.read(var_len);
         payload = json.loads(content);
-    
+        print(payload)
+
+        s.send_header("Content-Type", "application/json")
+        s.send_header("Access-Control-Allow-Origin", "*")
+        s.end_headers()
+
         if payload.get('train'):
-            nn.train(payload['trainArray'])
-            nn.save()
+            try:
+                nn.train(payload['trainArray'])
+                nn.save()
+            except Exception as inst:
+                print(inst)
+                response_code = 500
         elif payload.get('predict'):
             try:
                 response = {
                     "type": "test",
                     "result": nn.predict(str(payload['image'])),
                 }
-            except:
+            except Exception as inst:
+                print(inst)
                 response_code = 500
         else:
             response_code = 400
     
         s.send_response(response_code)
-        s.send_header("Content-Type", "application/json")
-        s.send_header("Access-Control-Allow-Origin", "*")
-        s.end_headers()
     
         if response:
             s.wfile.write(json.dumps(response))
