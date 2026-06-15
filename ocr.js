@@ -7,19 +7,19 @@ var ocrDemo = {
 	trainingRequestCount: 0,
 
 	drawGrid: (context) => {
-		for (var x = this.ocrDemo.PIXEL_WIDTH, y = this.ocrDemo.PIXEL_WIDTH;
-				 x < this.ocrDemo.CANVAS_WIDTH;
-				 x += this.ocrDemo.PIXEL_WIDTH, y += this.ocrDemo.PIXEL_WIDTH) {
+		for (var x = this.ocrDemo.PIXEL_WIDTH; x < this.ocrDemo.CANVAS_WIDTH; x += this.ocrDemo.PIXEL_WIDTH) {
 			context.strokeStyle = this.ocrDemo.BLUE;
 			context.beginPath();
 			context.moveTo(x, 0);
 			context.lineTo(x, this.ocrDemo.CANVAS_WIDTH);
 			context.stroke();
-
+		}
+		for (var y = this.ocrDemo.PIXEL_WIDTH; y < this.ocrDemo.CANVAS_WIDTH; y += this.ocrDemo.PIXEL_WIDTH) {
+			context.strokeStyle = this.ocrDemo.BLUE;
 			context.beginPath();
 			context.moveTo(0, y);
 			context.lineTo(this.ocrDemo.CANVAS_WIDTH, y);
-			context.stroke;
+			context.stroke();
 		}
 	},
 
@@ -61,11 +61,11 @@ var ocrDemo = {
 		const xPixel = Math.floor(x / this.ocrDemo.PIXEL_WIDTH);
 		const yPixel = Math.floor(y / this.ocrDemo.PIXEL_WIDTH);
 
-		context.fillStyle = '#ffffff';
+		context.fillStyle = '#000000';
 		context.fillRect(xPixel * this.ocrDemo.PIXEL_WIDTH,
-					 yPixel * this.ocrDemo.PIXEL_WIDTH,
-					 this.ocrDemo.PIXEL_WIDTH,
-					 this.ocrDemo.PIXEL_WIDTH);
+						 yPixel * this.ocrDemo.PIXEL_WIDTH,
+						 this.ocrDemo.PIXEL_WIDTH,
+						 this.ocrDemo.PIXEL_WIDTH);
 	},
 
 	train: () => {
