@@ -34,7 +34,7 @@ class MyServer(BaseHTTPRequestHandler):
         if payload.get('train'):
             try:
                 response = {
-                    "type": "test",
+                    "type": "train",
                     "result": self.nn.train(payload['trainArray'])
                 }
                 self.nn.save()
