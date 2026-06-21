@@ -19,6 +19,10 @@ FONTS = ["XM_BiaoHei.ttf",
          "XM_ZhengBai.ttf",
          "XM_ZhengHei.ttf"]
 
+def is_mongolian(char):
+    block = unicodedata.name(char).split()[0]
+    return block == 'MONGOLIAN'
+
 def remove_odd_characters(input_string):
     ODD_CHARACTERS = [
         '\t',
@@ -45,12 +49,23 @@ def remove_odd_characters(input_string):
     new_string = input_string
     for character in ODD_CHARACTERS:
         new_string = new_string.replace(character, ' ')
+
+    return new_string
+
+def mongolian_only(string):
+    new_string = ""
+    for char in string:
+        if is_mongolian(char):
+            new_string += char
     return new_string
 
 def split_string(input_string):
     new_string = remove_odd_characters(input_string)
     was_split = new_string != input_string
-    output = new_string.split()
+    split = new_string.split()
+    output = []
+    for item in split:
+        output.append(mongolian_only(item))
     return output
 
 def has_hanzi(word):
@@ -182,3 +197,21 @@ def find_longest_word():
     print("Has Hanzi: ", has_hanzi(longest_word))
 
     return longest_indices
+
+def find_all_unique_characters():
+    characters = []
+
+    entries = read_corpus()
+    for entry_index in range(len(entries)):
+        entry = json.loads(entries[entry_index])
+        manchu_words = split_string(entry['m'])
+        for word in manchu_words:
+            for character in word:
+                if (has_hanzi(character)): continue
+                if character not in characters:
+                    characters.append(character)
+
+    print('\n', characters, '\n', len(characters), '\n')
+    for char in characters:
+        print(char, unicodedata.name(char), is_mongolian(char))
+
