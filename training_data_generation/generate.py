@@ -2,9 +2,10 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import random
 import json
+import unicodedata
 
 width = 50
-height = 500
+height = 350
 
 FONTS = ["XM_BiaoHei.ttf",
          "XM_GuFeng.ttf",
@@ -18,6 +19,48 @@ FONTS = ["XM_BiaoHei.ttf",
          "XM_ZhengBai.ttf",
          "XM_ZhengHei.ttf"]
 
+def remove_odd_characters(input_string):
+    ODD_CHARACTERS = [
+        '\t',
+        '\n',
+        '/',
+        '(',
+        ')',
+        '[',
+        ']',
+        '!',
+        '︕',
+        '?',
+        '0',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+    ]
+    new_string = input_string
+    for character in ODD_CHARACTERS:
+        new_string = new_string.replace(character, ' ')
+    return new_string
+
+def split_string(input_string):
+    new_string = remove_odd_characters(input_string)
+    was_split = new_string != input_string
+    output = new_string.split()
+    return output
+
+def has_hanzi(word):
+    hanzi_blocks = ["KATAKANA", "CJK"]
+    for char in word:
+        block = unicodedata.name(char).split()[0]
+        for hanzi_block in hanzi_blocks:
+            if block == hanzi_block:
+                return True
+    return False
 
 def read_corpus():
     file = open("db.json", "r", encoding="utf-8")
@@ -29,8 +72,8 @@ def generate_random_image():
     entries = read_corpus()
     index = random.randrange(len(entries))
     entry = json.loads(entries[index])
-    abkai = entry['r'].split(' ')
-    words = entry['m'].split(' ')
+    abkai = split_string(entry['r'])
+    words = split_string(entry['m'])
     for word in words:
         generate_images(word, random.randrange(len(FONTS)))
     print(words, abkai)
@@ -71,7 +114,7 @@ def generate_training_data(start_index = 0, end_index = -1):
     training_data = []
     for index in range(start_index, end_index):
         entry = json.loads(entries[index])
-        manchu = entry['m'].split(' ')
+        manchu = split_string(entry['m'])
         for word in manchu:
             images = generate_images(word)
             for image in images:
@@ -94,7 +137,7 @@ def generate_image(word, font = 0):
     right = left + width
     bottom = height
     image2 = image.rotate(-90).crop([left, top, right, bottom])
-    # image2.show()
+    image2.show()
     return image2
 
 def generate_images(word, font = -1):
@@ -107,3 +150,35 @@ def generate_images(word, font = -1):
     for i in range(len(FONTS)):
         images.append(generate_image(word, i))
     return images
+
+def find_longest_word():
+    longest_indices = [0, 0]
+    longest_length = 0
+    longest_word = ""
+
+    entries = read_corpus()
+    for entry_index in range(len(entries)):
+        entry = json.loads(entries[entry_index])
+        manchu_words = split_string(entry['m'])
+
+        for word_index in range(len(manchu_words)):
+            word = manchu_words[word_index]
+
+            if has_hanzi(word): continue
+            
+            length = len(word)
+            if length > longest_length:
+                longest_length = length
+                longest_indices = [entry_index, word_index]
+                longest_word = word
+                
+    print('\n')
+    print(entries[longest_indices[0]])
+    print('\n')
+    print(longest_indices, longest_length)
+    print('\n')
+    print(longest_word)
+    print('\n')
+    print("Has Hanzi: ", has_hanzi(longest_word))
+
+    return longest_indices
