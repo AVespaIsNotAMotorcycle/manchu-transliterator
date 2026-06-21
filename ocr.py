@@ -2,6 +2,11 @@ import numpy as np
 import math
 import json
 
+INPUT_LAYER_SIZE = 50 * 350
+WORD_MAX_CHARACTERS = 30
+CHARACTERS_IN_ALPHABET = 38
+OUTPUT_LAYER_SIZE = WORD_MAX_CHARACTERS * CHARACTERS_IN_ALPHABET
+
 class NeuralNetwork:
     LEARNING_RATE = 0.2
     _use_file = True
@@ -15,10 +20,10 @@ class NeuralNetwork:
     
     def __init__(self, num_hidden_nodes):
         print("Initializing neural network")
-        self.theta1 = self._rand_initialize_weights(400, num_hidden_nodes)
-        self.theta2 = self._rand_initialize_weights(num_hidden_nodes, 10)
+        self.theta1 = self._rand_initialize_weights(INPUT_LAYER_SIZE, num_hidden_nodes)
+        self.theta2 = self._rand_initialize_weights(num_hidden_nodes, OUTPUT_LAYER_SIZE)
         self.input_layer_bias = self._rand_initialize_weights(1, num_hidden_nodes)
-        self.hidden_layer_bias = self._rand_initialize_weights(1, 10)
+        self.hidden_layer_bias = self._rand_initialize_weights(1, OUTPUT_LAYER_SIZE)
     
     def sigmoid(self, matrix):
         sigmoid_to_matrix = np.vectorize(self._sigmoid_scalar)
@@ -47,7 +52,7 @@ class NeuralNetwork:
         y1 = results['y1']
         y2 = results['y2']
 
-        actual_vals = [0] * 10
+        actual_vals = [0] * OUTPUT_LAYER_SIZE
         actual_vals[actual_digit] = 1
         output_errors = np.asmatrix(actual_vals).T - np.asmatrix(y2)
         hidden_errors = np.multiply(np.dot(np.asmatrix(self.theta2).T, output_errors), y1)
