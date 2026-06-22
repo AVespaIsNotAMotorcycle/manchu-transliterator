@@ -213,5 +213,5 @@ def find_all_unique_characters():
 
     print('\n', characters, '\n', len(characters), '\n')
     for char in characters:
-        print(char, unicodedata.name(char), is_mongolian(char))
+        print(char, unicodedata.name(char))
 
