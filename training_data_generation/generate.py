@@ -101,11 +101,8 @@ def collapse_channels(pixel):
 
     total_value = channel_1 + channel_2 + channel_3
     average = total_value / 3
-    inverse = 1.0 - average
-
-    rounded = np.rint([inverse])[0]
-    binary = int(bool(rounded))
-    return binary
+    if average > 0.9: return int(0)
+    else: return int(1)
 
 def simplify_array(array):
     simplified = []
