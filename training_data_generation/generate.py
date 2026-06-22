@@ -3,6 +3,7 @@ import numpy as np
 import random
 import json
 import unicodedata
+import sys
 
 width = 50
 height = 350
@@ -103,7 +104,7 @@ def collapse_channels(pixel):
     inverse = 1.0 - average
 
     rounded = np.rint([inverse])[0]
-    binary = bool(rounded)
+    binary = int(bool(rounded))
     return binary
 
 def simplify_array(array):
@@ -119,25 +120,55 @@ def simplify_array(array):
         simplified.append(new_row)
     return simplified
 
-def generate_training_data(start_index = 0, end_index = -1):
+def get_unique_words(start_index, end_index):
+    words = []
     entries = read_corpus()
-
-    if end_index == -1: end_index = len(entries)
-    if end_index < start_index + 1: end_index = start_index + 1
-    if end_index > len(entries): end_index = len(entries)
-
-    training_data = []
+    percent_per_entry = 1 / len(entries)
     for index in range(start_index, end_index):
         entry = json.loads(entries[index])
         manchu = split_string(entry['m'])
         for word in manchu:
-            images = generate_images(word)
-            for image in images:
-                image_array = np.array(image)
-                simple = simplify_array(image_array)
-                training_data.append([simple, word])
-    return training_data
+            if word not in words: words.append(word)
+    return words
 
+def image_array_to_string(array):
+    string = ""
+    for row in array:
+        for integer in row:
+            if integer > 0:
+                string += '1'
+            else:
+                string += '0'
+    return string
+
+def generate_training_data(start_index = 0, end_index = -1):
+    entries = read_corpus()
+
+    print("Assembling list of unique words...")
+    words = get_unique_words(0, len(entries))
+    word_count = len(words)
+    print("Found {0} unique words.".format(word_count))
+    file = open("../training_data.json", "w", encoding="utf-8")
+
+    if end_index == -1: end_index = word_count
+    if end_index < start_index + 1: end_index = start_index + 1
+    if end_index > word_count: end_index = word_count
+
+    for index in range(start_index, end_index):
+        word = words[index]
+        images = generate_images(word)
+        for image in images:
+            image_array = np.array(image)
+            simple = simplify_array(image_array)
+            file.write(json.dumps({ "image": image_array_to_string(simple), "word": word }) + '\n')
+
+        count_string = str(word_count)
+        index_string = str(index + 1).rjust(len(count_string), " ")
+        percent = int((index - start_index) / (end_index - start_index) * 100)
+        percent_string = "{0}%".format(percent).rjust(6, " ")
+        print("{0} / {1} | {2} | {3}".format(index_string, count_string, percent_string, word))
+
+    file.close()
 
 def generate_image(word, font = 0):
     font_name = FONTS[font]
@@ -152,7 +183,7 @@ def generate_image(word, font = 0):
     right = left + width
     bottom = height
     image2 = image.rotate(-90).crop([left, top, right, bottom])
-    image2.show()
+    # image2.show()
     return image2
 
 def generate_images(word, font = -1):
@@ -215,3 +246,4 @@ def find_all_unique_characters():
     for char in characters:
         print(char, unicodedata.name(char))
 
+generate_training_data(int(sys.argv[1]), int(sys.argv[2]))
