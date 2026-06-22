@@ -2,9 +2,51 @@ import numpy as np
 import math
 import json
 
+ALPHABET = [
+    " ", # EMPTY
+    "ᠸ", # MONGGOLIAN LETTER WA
+    "ᡝ", # MONGGOLIAN LETTER SIBE E
+    "ᡳ", # MONGGOLIAN LETTER MANCHU I
+    "ᠯ", # MONGGOLIAN LETTER LA
+    "ᠪ", # MONGGOLIAN LETTER BA
+    "ᡩ", # MONGGOLIAN LETTER SIBE DA
+    "ᡵ", # MONGGOLIAN LETTER MANCHU RA
+    "ᠵ", # MONGGOLIAN LETTER JA
+    "ᠠ", # MONGGOLIAN LETTER A
+    "ᠩ", # MONGGOLIAN LETTER ANG
+    "ᡤ", # MONGGOLIAN LETTER SIBE GA
+    "ᠨ", # MONGGOLIAN LETTER NA
+    "ᡴ", # MONGGOLIAN LETTER MANCHU KA
+    "ᠴ", # MONGGOLIAN LETTER CHA
+    "ᡠ", # MONGGOLIAN LETTER SIBE UE
+    "ᡥ", # MONGGOLIAN LETTER SIBE HA
+    "ᡡ", # MONGGOLIAN LETTER SIBE U
+    "ᠮ", # MONGGOLIAN LETTER MA
+    "ᠣ", # MONGGOLIAN LETTER O
+    "ᡧ", # MONGGOLIAN LETTER SIBE SHA
+    "ᡶ", # MONGGOLIAN LETTER MANCHU FA
+    "ᠶ", # MONGGOLIAN LETTER YA
+    "ᠰ", # MONGGOLIAN LETTER SA
+    "ᡬ", # MONGGOLIAN LETTER SIBE GAA
+    "ᡨ", # MONGGOLIAN LETTER SIBE TA
+    "ᡰ", # MONGGOLIAN LETTER SIBE RAA
+    "ᡦ", # MONGGOLIAN LETTER SIBE PA
+    "᠈", # MONGGOLIAN MANCHU COMMA
+    "", # MONGGOLIAN FREE VARIATION SELECTOR ONE
+    "᠉", # MONGGOLIAN MANCHU FULL STOP
+    "ᠺ", # MONGGOLIAN LETTER KA
+    "ᡮ", # MONGGOLIAN LETTER SIBE TSA
+    "ᡟ", # MONGGOLIAN LETTER SIBE IY
+    "ᡯ", # MONGGOLIAN LETTER SIBE ZA
+    "ᡱ", # MONGGOLIAN LETTER SIBE CHA
+    "ᡭ", # MONGGOLIAN LETTER SIBE HAA
+    "", # MONGGOLIAN VOWEL SEPARATOR
+    "ᡷ", # MONGGOLIAN LETTER MANCHU ZHA
+]
+
 INPUT_LAYER_SIZE = 50 * 350
 WORD_MAX_CHARACTERS = 30
-CHARACTERS_IN_ALPHABET = 38 + 1 # add one for empty chars
+CHARACTERS_IN_ALPHABET = len(ALPHABET) # add one for empty chars
 OUTPUT_LAYER_SIZE = WORD_MAX_CHARACTERS * CHARACTERS_IN_ALPHABET
 
 class NeuralNetwork:
@@ -25,6 +67,34 @@ class NeuralNetwork:
         self.input_layer_bias = self._rand_initialize_weights(1, num_hidden_nodes)
         self.hidden_layer_bias = self._rand_initialize_weights(1, OUTPUT_LAYER_SIZE)
     
+    def word_to_array(self, input_word):
+        word = input_word.strip()
+        array = [0] * OUTPUT_LAYER_SIZE
+        for i in range(len(word)):
+            char = word[i]
+            char_index = ALPHABET.index(char)
+            array_index = (i * CHARACTERS_IN_ALPHABET) + char_index
+            array[array_index] = 1
+        return array
+
+    def array_to_word(self, array):
+        word = ""
+        for char_index in range(WORD_MAX_CHARACTERS):
+            start_index = char_index * CHARACTERS_IN_ALPHABET
+            end_index = start_index + CHARACTERS_IN_ALPHABET
+
+            max_certainty = 0
+            max_index = start_index
+            for i in range(start_index, end_index):
+                certainty = array[i]
+                if certainty > max_certainty:
+                    max_certainty = certainty
+                    max_index = i
+            letter_index = max_index - start_index
+            letter = ALPHABET[letter_index]
+            word += letter
+        return word.strip()
+
     def sigmoid(self, matrix):
         sigmoid_to_matrix = np.vectorize(self._sigmoid_scalar)
         new_matrix = sigmoid_to_matrix(matrix)
