@@ -133,12 +133,15 @@ def get_unique_words(start_index, end_index):
 
 def image_array_to_string(array):
     string = ""
+    empty_space = ""
     for row in array:
         for integer in row:
             if integer > 0:
+                string += empty_space
+                empty_space = ""
                 string += '1'
             else:
-                string += '0'
+                empty_space += '0'
     return string
 
 def generate_training_data(start_index = 0, end_index = -1):
