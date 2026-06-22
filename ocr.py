@@ -100,7 +100,13 @@ class NeuralNetwork:
         new_matrix = sigmoid_to_matrix(matrix)
         return new_matrix
 
-    def forward_propogate(self, pixels):
+    def forward_propogate(self, pixel_string):
+        pixels = [0] * INPUT_LAYER_SIZE
+        for i in range(len(pixel_string)):
+            char = pixel_string[i]
+            if char == '1': pixels[i] = 1
+        print(pixel_string, '\n', pixels)
+
         y1 = np.dot(np.asmatrix(self.theta1), np.asmatrix(pixels).T)
         y1 = y1 + np.asmatrix(self.input_layer_bias)
         y1 = self.sigmoid(y1)
@@ -158,23 +164,29 @@ class NeuralNetwork:
     
     def predict(self, test):
         predictions = self.forward_propogate(test)['predictions']
-    
+   
+        '''
+        # HOLDOVER FROM OCR TUTORIAL
         highest_confidence = max(predictions)
         confidence_percent = int(highest_confidence * 100)
         prediction = predictions.index(highest_confidence)
         print("Predicting digit is {0} with {1}% confidence".format(prediction, confidence_percent))
         return { "digit": predictions.index(max(predictions)), "confidence": confidence_percent }
+        '''
+        word = self.array_to_word(predictions)
+        return { "array": predictions, "word": word }
 
-    def train_on_example(self, pixels, digit):
+    def train_on_example(self, pixels, actual_word):
         prediction = self.predict(pixels)
-        results = self.forward_propogate(pixels)
-        self.back_propogate(pixels, results, digit)
-        print("Actual digit is {0}".format(digit))
-        return { "prediction": prediction['digit'], "actual": digit }
+        pred_word = prediction["word"]
+        pred_array = prediction["array"]
+        self.back_propogate(pixels, pred_array, actual_word)
+        print("Predicted {0}, actual word is {1}", pred_word, actual_word)
+        return { "prediction": pred_word, "actual": actual_word }
 
     def train(self, training_data):
         predictions = []
         for example in training_data:
-            prediction = self.train_on_example(example['y0'], example['label'])
+            prediction = self.train_on_example(example['image'], example['word'])
             predictions.append(prediction)
         return predictions
