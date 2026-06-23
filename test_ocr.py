@@ -1,4 +1,4 @@
-from ocr import NeuralNetwork
+from ocr_full_image import NeuralNetwork
 import json
 
 def test_array_to_word():

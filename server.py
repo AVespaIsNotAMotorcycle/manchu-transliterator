@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import json
-from ocr import NeuralNetwork
+from ocr_full_image import NeuralNetwork
 
 hostName = "localhost"
 serverPort = 8080
