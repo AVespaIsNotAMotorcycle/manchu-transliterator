@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import json
+import unicodedata
 
 ALPHABET = [
     " ", # EMPTY
@@ -42,6 +43,7 @@ ALPHABET = [
     "ᡭ", # MONGGOLIAN LETTER SIBE HAA
     "", # MONGGOLIAN VOWEL SEPARATOR
     "ᡷ", # MONGGOLIAN LETTER MANCHU ZHA
+    "\u180b", # MONGOLIAN FREE VARIATION SELECTOR ONE
 ]
 
 INPUT_LAYER_SIZE = 50 * 350
@@ -50,7 +52,7 @@ CHARACTERS_IN_ALPHABET = len(ALPHABET) # add one for empty chars
 OUTPUT_LAYER_SIZE = WORD_MAX_CHARACTERS * CHARACTERS_IN_ALPHABET
 
 class NeuralNetwork:
-    LEARNING_RATE = 0.2
+    LEARNING_RATE = 0.5
     _use_file = True
     NN_FILE_PATH = "saved_ann.json"
 
@@ -81,6 +83,7 @@ class NeuralNetwork:
         array = [0] * OUTPUT_LAYER_SIZE
         for i in range(len(word)):
             char = word[i]
+            if char not in ALPHABET: print("[{0}] {1}".format(char, unicodedata.name(char)))
             char_index = ALPHABET.index(char)
             array_index = (i * CHARACTERS_IN_ALPHABET) + char_index
             array[array_index] = 1
@@ -193,13 +196,13 @@ class NeuralNetwork:
 
     def word_similarity(self, a, b):
         padded_a = a.ljust(WORD_MAX_CHARACTERS, " ")
-        padded_b = a.ljust(WORD_MAX_CHARACTERS, " ")
+        padded_b = b.ljust(WORD_MAX_CHARACTERS, " ")
 
         matches = 0
         for index in range(len(padded_a)):
             char_a = padded_a[index]
             char_b = padded_b[index]
-            if char_a == char_b: matches =+ 1
+            if char_a == char_b: matches += 1
 
         return int(matches / WORD_MAX_CHARACTERS * 100)
 
@@ -209,10 +212,11 @@ class NeuralNetwork:
         for index in range(len(training_data)):
             example = training_data[index]
             prediction = self.train_on_example(example['image'], example['word'])
-            print("{0} | {1}% | {2} | {3}".format(index,
-                                                 self.word_similarity(prediction['prediction'],
-                                                                      prediction['actual']),
-                                                 prediction['prediction'],
+            print("{0} | {1}% | {2} | {3}".format(str(index).rjust(6, ' '),
+                                                 str(self.word_similarity(prediction['prediction'],
+                                                                          prediction['actual']))
+                                                  .rjust(3, " "),
+                                                 prediction['prediction'].ljust(WORD_MAX_CHARACTERS, " "),
                                                  prediction['actual']))
             predictions.append(prediction)
         return predictions

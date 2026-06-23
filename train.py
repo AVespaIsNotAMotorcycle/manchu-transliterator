@@ -28,7 +28,7 @@ def train():
     print("Initializing neural network...")
     nn = NeuralNetwork(100)
 
-    examples = get_training_data(0, 2500)
+    examples = get_training_data(4674, 5000)
     print("Training...")
     predictions = nn.train(examples)
     print("Trained.")
