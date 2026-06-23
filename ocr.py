@@ -52,7 +52,7 @@ CHARACTERS_IN_ALPHABET = len(ALPHABET) # add one for empty chars
 OUTPUT_LAYER_SIZE = WORD_MAX_CHARACTERS * CHARACTERS_IN_ALPHABET
 
 class NeuralNetwork:
-    LEARNING_RATE = 0.5
+    LEARNING_RATE = 0.1
     _use_file = True
     NN_FILE_PATH = "saved_ann.json"
 
@@ -79,7 +79,7 @@ class NeuralNetwork:
         return array
 
     def word_to_array(self, input_word):
-        word = input_word.strip()
+        word = input_word.strip().ljust(WORD_MAX_CHARACTERS, ' ')
         array = [0] * OUTPUT_LAYER_SIZE
         for i in range(len(word)):
             char = word[i]
@@ -129,11 +129,30 @@ class NeuralNetwork:
             "predictions": predictions,
         }
         return results
-    
+
+    def print_word_array(self, word):
+        array = self.word_to_array(word)
+        line = ""
+        char = '_'
+        sumline = 0
+        print(word)
+        for index in range(len(array)):
+            if index > 0: line += ' '
+            if index % CHARACTERS_IN_ALPHABET == 0 and index > 0:
+                print("'{0}' | {1} | {2}\n".format(char, line, sumline))
+                line = ""
+                char = '_'
+                sumline = 0
+            line += str(array[index])
+            if array[index] == 1:
+                char = ALPHABET[index % CHARACTERS_IN_ALPHABET]
+                sumline += 1
+
     def back_propogate(self, pixels, results, actual_word):
         y1 = results['y1']
         y2 = results['y2']
 
+        # self.print_word_array(actual_word)
         actual_vals = self.word_to_array(actual_word)
         output_errors = np.asmatrix(actual_vals).T - np.asmatrix(y2)
         hidden_errors = np.multiply(np.dot(np.asmatrix(self.theta2).T, output_errors), y1)

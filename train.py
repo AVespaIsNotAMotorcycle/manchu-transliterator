@@ -1,5 +1,6 @@
 from ocr import NeuralNetwork
 import json
+import random
 
 def get_training_data(start, end):
     print("Loading training data...")
@@ -7,8 +8,10 @@ def get_training_data(start, end):
     raw_lines = file.readlines()
     lines = []
     for index in range(start, end):
-        line = raw_lines[index]
-        lines.append(json.loads(line))
+        try:
+            line = raw_lines[index]
+            lines.append(json.loads(line))
+        except: continue
     print("Loaded training data.")
     return lines
 
@@ -28,8 +31,9 @@ def train():
     print("Initializing neural network...")
     nn = NeuralNetwork(100)
 
-    examples = get_training_data(4674, 5000)
+    examples = get_training_data(0, 3000)
     print("Training...")
+    random.shuffle(examples)
     predictions = nn.train(examples)
     print("Trained.")
     print_progress(examples, predictions)
