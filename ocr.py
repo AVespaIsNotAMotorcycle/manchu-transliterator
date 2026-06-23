@@ -4,6 +4,7 @@ import json
 import unicodedata
 
 from abkai import manchu_to_abkai
+from utils import INPUT_LAYER_SIZE, pixel_string_to_array
 
 ALPHABET = [
     " ", # EMPTY
@@ -72,13 +73,6 @@ class NeuralNetwork:
         self.input_layer_bias = self._rand_initialize_weights(1, num_hidden_nodes)
         self.hidden_layer_bias = self._rand_initialize_weights(1, OUTPUT_LAYER_SIZE)
    
-    def pixel_string_to_array(self, string):
-        array = [0] * INPUT_LAYER_SIZE
-        for index in range(len(string)):
-            char = string[index]
-            if char == '1': array[index] = 1
-        return array
-
     def word_to_array(self, input_word):
         word = input_word.strip().ljust(WORD_MAX_CHARACTERS, ' ')
         array = [0] * OUTPUT_LAYER_SIZE
@@ -189,7 +183,7 @@ class NeuralNetwork:
     
     def predict(self, test):
         pixel_string = test["image"]
-        pixels = self.pixel_string_to_array(pixel_string)
+        pixels = pixel_string_to_array(pixel_string)
         predictions = self.forward_propogate(pixels)['predictions']
    
         '''
@@ -204,7 +198,7 @@ class NeuralNetwork:
         return { "array": predictions, "word": word }
 
     def train_on_example(self, pixel_string, actual_word):
-        pixels = self.pixel_string_to_array(pixel_string)
+        pixels = pixel_string_to_array(pixel_string)
         output = self.forward_propogate(pixels)
 
         
