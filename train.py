@@ -13,6 +13,7 @@ def get_training_data(start, end):
             lines.append(json.loads(line))
         except: continue
     print("Loaded training data.")
+    file.close()
     return lines
 
 def print_progress(examples, predictions):
@@ -26,12 +27,17 @@ def print_progress(examples, predictions):
         predicted_word = prediction["prediction"]
         correct = actual_word == predicted_word
         logs.append({ "actual": actual_word, "predicted": predicted_word, "correct": correct })
+    file = open("training_logs.json", "w")
+    for entry in logs:
+        file.write(json.dumps(entry))
+        file.write('\r')
+    file.close()
 
 def train():
     print("Initializing neural network...")
     nn = NeuralNetwork(100)
 
-    examples = get_training_data(0, 3000)
+    examples = get_training_data(0, 5000)
     print("Training...")
     random.shuffle(examples)
     predictions = nn.train(examples)

@@ -1,5 +1,6 @@
 saved_ann.json
 training_data.json
+training_logs.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
