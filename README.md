@@ -24,3 +24,8 @@ An initial, simple attempt at processing the input was to simply look at the ent
 Manchu words are written with all the letters joined by a vertical line. However, what really conveys information is what's on either side of the line (or where it disappears). Now the ANN would detect and remove the center line from images before attempting to read them.
 
 <img width="1081" height="887" alt="image" src="https://github.com/user-attachments/assets/adde2d6a-763b-42a5-92d5-73270c052b17" />
+
+This resulted in a modest performance increase, from 20% of characters correctly identified to 24%.
+
+<img width="1008" height="623" alt="chart(4)" src="https://github.com/user-attachments/assets/8967f9a6-ce71-4664-b7a2-39ab754bf175" />
+
