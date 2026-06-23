@@ -10,3 +10,12 @@ various fonts. Each word has - as of now - eleven variations. The words were pul
 [manchu-cake](https://github.com/OverflowCat/manchu-cake).
 
 <img width="1858" height="1053" alt="Screenshot From 2026-06-18 12-05-26" src="https://github.com/user-attachments/assets/57929c0c-419f-42d1-bc4d-903f57ab2e4e" />
+
+## Processing
+
+### Attempt One
+
+An initial, simple attempt at processing the input was to simply look at the entire image and generate a length `x * y` array, where `x` is the length of the longest word plus some padding (I chose 30 characters), and `y` is the number of characters in the alphabet (39 if you include whitespace). After being trained on 51,358 words, the results were bad. The ANN's predictions of the length of the string were off by about 3%, and it correctly identified about 20% of the characters within any given word.
+
+<img width="888" height="549" alt="chart(1)" src="https://github.com/user-attachments/assets/4b43d281-1b6e-4bb2-b9e0-ee91cb90bcb1" />
+
