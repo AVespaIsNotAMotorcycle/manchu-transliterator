@@ -3,6 +3,8 @@ import math
 import json
 import unicodedata
 
+from abkai import manchu_to_abkai
+
 ALPHABET = [
     " ", # EMPTY
     "ᠸ", # MONGGOLIAN LETTER WA
@@ -235,7 +237,7 @@ class NeuralNetwork:
                                                  str(self.word_similarity(prediction['prediction'],
                                                                           prediction['actual']))
                                                   .rjust(3, " "),
-                                                 prediction['prediction'].ljust(WORD_MAX_CHARACTERS, " "),
-                                                 prediction['actual']))
+                                                 manchu_to_abkai(prediction['prediction']).ljust(WORD_MAX_CHARACTERS, " "),
+                                                 manchu_to_abkai(prediction['actual'])))
             predictions.append(prediction)
         return predictions
