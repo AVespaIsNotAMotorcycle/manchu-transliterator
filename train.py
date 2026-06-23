@@ -2,11 +2,12 @@ from ocr import NeuralNetwork
 import json
 import random
 
-def get_training_data(start, end):
+def get_training_data(start, end = -1):
     print("Loading training data...")
     file = open("training_data.json", "r")
     raw_lines = file.readlines()
     lines = []
+    if end == -1: end = len(raw_lines)
     for index in range(start, end):
         try:
             line = raw_lines[index]
@@ -37,7 +38,7 @@ def train():
     print("Initializing neural network...")
     nn = NeuralNetwork(100)
 
-    examples = get_training_data(0, 5000)
+    examples = get_training_data(0)
     print("Training...")
     random.shuffle(examples)
     predictions = nn.train(examples)
