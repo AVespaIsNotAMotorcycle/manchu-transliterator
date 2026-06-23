@@ -60,6 +60,9 @@ def mark_center_line(image_array, color_code = 2):
 
     starts = list(filter(lambda x: x >= 0, starts))
     ends = list(filter(lambda x: x >= 0, ends))
+    
+    if len(starts) == 0: return image_array
+    if len(ends) == 0: return image_array
 
     median_start = statistics.median(starts)
     median_end = statistics.median(ends)
