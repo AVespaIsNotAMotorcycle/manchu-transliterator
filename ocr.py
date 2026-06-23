@@ -58,6 +58,8 @@ class NeuralNetwork:
         return [((x * 0.12) - 0.06) for x in np.random.rand(size_out, size_in)]
     
     def _sigmoid_scalar(self, z):
+        if z >= 15: return 1
+        if z <= -15: return 0
         return 1 / (1 + math.e ** -z)
     
     def __init__(self, num_hidden_nodes):
@@ -66,7 +68,14 @@ class NeuralNetwork:
         self.theta2 = self._rand_initialize_weights(num_hidden_nodes, OUTPUT_LAYER_SIZE)
         self.input_layer_bias = self._rand_initialize_weights(1, num_hidden_nodes)
         self.hidden_layer_bias = self._rand_initialize_weights(1, OUTPUT_LAYER_SIZE)
-    
+   
+    def pixel_string_to_array(self, string):
+        array = [0] * INPUT_LAYER_SIZE
+        for index in range(len(string)):
+            char = string[index]
+            if char == '1': array[index] = 1
+        return array
+
     def word_to_array(self, input_word):
         word = input_word.strip()
         array = [0] * OUTPUT_LAYER_SIZE
@@ -100,13 +109,7 @@ class NeuralNetwork:
         new_matrix = sigmoid_to_matrix(matrix)
         return new_matrix
 
-    def forward_propogate(self, pixel_string):
-        pixels = [0] * INPUT_LAYER_SIZE
-        for i in range(len(pixel_string)):
-            char = pixel_string[i]
-            if char == '1': pixels[i] = 1
-        print(pixel_string, '\n', pixels)
-
+    def forward_propogate(self, pixels):
         y1 = np.dot(np.asmatrix(self.theta1), np.asmatrix(pixels).T)
         y1 = y1 + np.asmatrix(self.input_layer_bias)
         y1 = self.sigmoid(y1)
@@ -124,12 +127,11 @@ class NeuralNetwork:
         }
         return results
     
-    def back_propogate(self, pixels, results, actual_digit):
+    def back_propogate(self, pixels, results, actual_word):
         y1 = results['y1']
         y2 = results['y2']
 
-        actual_vals = [0] * OUTPUT_LAYER_SIZE
-        actual_vals[actual_digit] = 1
+        actual_vals = self.word_to_array(actual_word)
         output_errors = np.asmatrix(actual_vals).T - np.asmatrix(y2)
         hidden_errors = np.multiply(np.dot(np.asmatrix(self.theta2).T, output_errors), y1)
     
@@ -163,7 +165,9 @@ class NeuralNetwork:
         self.hidden_layer_bias = [np.array(nn['b2'][0])]
     
     def predict(self, test):
-        predictions = self.forward_propogate(test)['predictions']
+        pixel_string = test["image"]
+        pixels = self.pixel_string_to_array(pixel_string)
+        predictions = self.forward_propogate(pixels)['predictions']
    
         '''
         # HOLDOVER FROM OCR TUTORIAL
@@ -176,17 +180,39 @@ class NeuralNetwork:
         word = self.array_to_word(predictions)
         return { "array": predictions, "word": word }
 
-    def train_on_example(self, pixels, actual_word):
-        prediction = self.predict(pixels)
-        pred_word = prediction["word"]
-        pred_array = prediction["array"]
-        self.back_propogate(pixels, pred_array, actual_word)
-        print("Predicted {0}, actual word is {1}", pred_word, actual_word)
+    def train_on_example(self, pixel_string, actual_word):
+        pixels = self.pixel_string_to_array(pixel_string)
+        output = self.forward_propogate(pixels)
+
+        
+        pred_array = output["predictions"]
+        pred_word = self.array_to_word(pred_array)
+
+        self.back_propogate(pixels, output, actual_word)
         return { "prediction": pred_word, "actual": actual_word }
+
+    def word_similarity(self, a, b):
+        padded_a = a.ljust(WORD_MAX_CHARACTERS, " ")
+        padded_b = a.ljust(WORD_MAX_CHARACTERS, " ")
+
+        matches = 0
+        for index in range(len(padded_a)):
+            char_a = padded_a[index]
+            char_b = padded_b[index]
+            if char_a == char_b: matches =+ 1
+
+        return int(matches / WORD_MAX_CHARACTERS * 100)
 
     def train(self, training_data):
         predictions = []
-        for example in training_data:
+        # for example in training_data:
+        for index in range(len(training_data)):
+            example = training_data[index]
             prediction = self.train_on_example(example['image'], example['word'])
+            print("{0} | {1}% | {2} | {3}".format(index,
+                                                 self.word_similarity(prediction['prediction'],
+                                                                      prediction['actual']),
+                                                 prediction['prediction'],
+                                                 prediction['actual']))
             predictions.append(prediction)
         return predictions
