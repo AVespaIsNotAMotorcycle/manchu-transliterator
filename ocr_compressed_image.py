@@ -4,8 +4,8 @@ import json
 import unicodedata
 
 from abkai import manchu_to_abkai
-from utils import INPUT_LAYER_SIZE, pixel_string_to_array
-from preprocessing import preprocess
+from utils import pixel_string_to_array
+from preprocessing import compress, JOINT_COMPRESSED_WIDTH
 
 ALPHABET = [
     " ", # EMPTY
@@ -49,7 +49,7 @@ ALPHABET = [
     "\u180b", # MONGOLIAN FREE VARIATION SELECTOR ONE
 ]
 
-INPUT_LAYER_SIZE = 50 * 350
+INPUT_LAYER_SIZE = JOINT_COMPRESSED_WIDTH * 350
 WORD_MAX_CHARACTERS = 30
 CHARACTERS_IN_ALPHABET = len(ALPHABET)
 OUTPUT_LAYER_SIZE = WORD_MAX_CHARACTERS * CHARACTERS_IN_ALPHABET
@@ -185,7 +185,7 @@ class NeuralNetwork:
     def predict(self, test):
         pixel_string = test["image"]
         pixels = pixel_string_to_array(pixel_string)
-        pixels = preprocess(pixels)
+        pixels = compress(pixels)
         predictions = self.forward_propogate(pixels)['predictions']
    
         '''
@@ -201,7 +201,7 @@ class NeuralNetwork:
 
     def train_on_example(self, pixel_string, actual_word):
         pixels = pixel_string_to_array(pixel_string)
-        pixels = preprocess(pixels)
+        pixels = compress(pixels)
         output = self.forward_propogate(pixels)
 
         

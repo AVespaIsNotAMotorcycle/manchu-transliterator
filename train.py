@@ -1,4 +1,5 @@
-from ocr_full_image import NeuralNetwork
+# from ocr_full_image import NeuralNetwork
+from ocr_compressed_image import NeuralNetwork
 import json
 import random
 
